@@ -1,9 +1,23 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+type Preset = {
+  id: string;
+  nome: string;
+  pedaleira: string;
+  descricao: string | null;
+  arquivo_path: string | null;
+  downloads: number;
+};
 
 type corpoProps = {
   secao: string;
 };
+
+// Nome do bucket no Storage do Supabase (precisa ser público).
+// Se o seu bucket tiver outro nome, troque aqui.
+const BUCKET = "presets";
 
 const PIX_CHAVE = "1e36d8c1-cfdf-4f14-aea8-df81d47cb8e3";
 const PIX_NOME = "João Eduardo Paiva da Costa";
@@ -11,6 +25,15 @@ const PIX_BANCO = "Mercado Pago";
 
 const LINK_YOUTUBE = "https://www.youtube.com/@somdebaixocusto";
 const LINK_INSTAGRAM = "https://www.instagram.com/somdebaixocusto";
+
+const imagemDaPedaleira = (pedaleira: string) =>
+  pedaleira.toLowerCase().includes("zoom") ? "/b1on.png" : "/tankB.png";
+
+const ehZoom = (pedaleira: string) => pedaleira.toLowerCase().includes("zoom");
+
+const urlDownload = (caminho: string) =>
+  supabase.storage.from(BUCKET).getPublicUrl(caminho, { download: true }).data
+    .publicUrl;
 
 const animacao = (aberto: boolean, lado: "esquerda" | "direita") =>
   `flex flex-col lg:flex-row gap-4 px-4 md:px-0 overflow-hidden transition-all duration-[1800ms] ease-in-out ${
@@ -30,6 +53,18 @@ const iconeSocial = (visivel: boolean) =>
 
 export default function Corpo({ secao }: corpoProps) {
   const [copiado, setCopiado] = useState(false);
+  const [presets, setPresets] = useState<Preset[]>([]);
+
+  useEffect(() => {
+    supabase
+      .from("presets")
+      .select("id, nome, pedaleira, descricao, arquivo_path, downloads")
+      .order("created_at", { ascending: true })
+      .then(({ data, error }) => {
+        if (error) console.error("Erro ao buscar presets:", error);
+        else setPresets(data ?? []);
+      });
+  }, []);
 
   const copiarPix = async () => {
     try {
@@ -54,20 +89,8 @@ export default function Corpo({ secao }: corpoProps) {
     },
   ];
 
-  const presets = [
-    {
-      nome: "Presets Tank-B",
-      pedaleira: "Tank B",
-      descricao: "5 presets para você usar na tank-b.",
-      imagem: "/tankB.png",
-    },
-    {
-      nome: "Presets B1on/B1xon",
-      pedaleira: "Zoom",
-      descricao: "5 presets para você usar na zoom.",
-      imagem: "/b1on.png",
-    },
-  ];
+  // O card da Zoom fica como "em breve" enquanto não houver preset dela no banco.
+  const temZoomNoBanco = presets.some((p) => ehZoom(p.pedaleira));
 
   const inicio = secao === "inicio";
 
@@ -177,14 +200,14 @@ export default function Corpo({ secao }: corpoProps) {
           </p>
         </div>
 
-        {presets.map((p, i) => (
+        {presets.map((p) => (
           <div
-            key={i}
+            key={p.id}
             className="w-full max-w-sm md:w-64 shrink-0 border rounded-2xl overflow-hidden shadow bg-white"
           >
             <img
               className="w-full h-52 object-cover"
-              src={p.imagem}
+              src={imagemDaPedaleira(p.pedaleira)}
               alt={`${p.nome} - ${p.pedaleira}`}
             />
 
@@ -193,13 +216,54 @@ export default function Corpo({ secao }: corpoProps) {
                 {p.nome}
               </h3>
               <p className="text-xs text-stone-500">{p.pedaleira}</p>
-              <p className="text-sm text-stone-700 mt-2">{p.descricao}</p>
-              <button className="mt-3 bg-stone-900 text-white rounded-2xl px-4 py-2 transform hover:-translate-y-0.5">
-                Baixar
-              </button>
+              {p.descricao && (
+                <p className="text-sm text-stone-700 mt-2">{p.descricao}</p>
+              )}
+
+              {p.arquivo_path ? (
+                <a
+                  href={urlDownload(p.arquivo_path)}
+                  className="mt-3 inline-block bg-stone-900 text-white rounded-2xl px-4 py-2 transform hover:-translate-y-0.5"
+                >
+                  Baixar
+                </a>
+              ) : (
+                <button
+                  disabled
+                  className="mt-3 bg-stone-400 text-white rounded-2xl px-4 py-2 cursor-not-allowed"
+                >
+                  Indisponível
+                </button>
+              )}
             </div>
           </div>
         ))}
+
+        {!temZoomNoBanco && (
+          <div className="w-full max-w-sm md:w-64 shrink-0 border rounded-2xl overflow-hidden shadow bg-white">
+            <img
+              className="w-full h-52 object-cover"
+              src="/b1on.png"
+              alt="Presets Zoom - em breve"
+            />
+
+            <div className="p-4">
+              <h3 className="font-heading text-black font-bold text-lg uppercase tracking-wide">
+                em breve
+              </h3>
+              <p className="text-xs text-stone-500">Zoom</p>
+              <p className="text-sm text-stone-700 mt-2">
+                5 presets para você usar na zoom.
+              </p>
+              <button
+                disabled
+                className="mt-3 bg-stone-400 text-white rounded-2xl px-4 py-2 cursor-not-allowed"
+              >
+                Em breve
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
