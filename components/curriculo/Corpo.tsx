@@ -23,6 +23,9 @@ const PIX_CHAVE = "1e36d8c1-cfdf-4f14-aea8-df81d47cb8e3";
 const PIX_NOME = "João Eduardo Paiva da Costa";
 const PIX_BANCO = "Mercado Pago";
 
+// Nome exato do arquivo da Zoom B1on no Storage.
+const ZOOM_ARQUIVO = "Zoom b1on presets.zip";
+
 const LINK_YOUTUBE = "https://www.youtube.com/@somdebaixocusto";
 const LINK_INSTAGRAM = "https://www.instagram.com/somdebaixocusto";
 
@@ -50,6 +53,70 @@ const iconeSocial = (visivel: boolean) =>
   `absolute top-1/2 -translate-y-1/2 transition-opacity duration-[1200ms] ease-in-out ${
     visivel ? "opacity-100" : "opacity-0 pointer-events-none"
   }`;
+
+const painelAfiliados = (aberto: boolean) =>
+  `w-full transition-opacity duration-[1200ms] ease-in-out ${
+    aberto
+      ? "max-w-6xl opacity-100 px-4 py-4"
+      : "max-w-0 max-h-0 overflow-hidden opacity-0"
+  }`;
+
+const listaAfiliados = [
+  {
+    nome: "M-Vave Blackbox",
+    tipo: "Pedal multiefeitos",
+    loja: "Mercado Livre",
+    preco: "R$ 356,81",
+    descricao: "",
+    url: "https://meli.la/2fknT58",
+    imagem: "/afiliados/a(1).png",
+  },
+  {
+    nome: "M-Vave Tank-B",
+    tipo: "Pedaleira para baixo",
+    loja: "Mercado Livre",
+    preco: "R$ 337,81",
+    descricao: "",
+    url: "https://meli.la/1eZohWE",
+    imagem: "/afiliados/a(2).png",
+  },
+  {
+    nome: "Sonicake Octaver",
+    tipo: "Pedal de oitava",
+    loja: "AliExpress",
+    preco: "R$ 136,14",
+    descricao: "",
+    url: "https://s.click.aliexpress.com/e/_c3jtNdkt",
+    imagem: "/afiliados/a(3).png",
+  },
+  {
+    nome: "Valeton GP-5",
+    tipo: "Multiefeitos",
+    loja: "Mercado Livre",
+    preco: "R$ 485,46",
+    descricao: "",
+    url: "https://meli.la/1UetE6K",
+    imagem: "/afiliados/a(4).png",
+  },
+  {
+    nome: "M-Vave Cube Baby Bass",
+    tipo: "Mini amplificador",
+    loja: "Mercado Livre",
+    preco: "R$ 152,50",
+    descricao: "",
+    url: "https://meli.la/2f9CSY6",
+    imagem: "/afiliados/a(5).png",
+  },
+  {
+    nome: "Valeton GP-50",
+    tipo: "Multiefeitos",
+    loja: "AliExpress",
+    preco: "R$ 659,34",
+    descricao: "",
+    url: "https://s.click.aliexpress.com/e/_c4dffwXF",
+    imagem: "/afiliados/a(6).png",
+  },
+];
 
 export default function Corpo({ secao }: corpoProps) {
   const [copiado, setCopiado] = useState(false);
@@ -89,10 +156,25 @@ export default function Corpo({ secao }: corpoProps) {
     },
   ];
 
-  // O card da Zoom fica como "em breve" enquanto não houver preset dela no banco.
+  // Se a linha da Zoom não carregar do banco, mostra um card reserva
+  // com o download direto do arquivo.
   const temZoomNoBanco = presets.some((p) => ehZoom(p.pedaleira));
 
   const inicio = secao === "inicio";
+  const afiliados = secao === "afiliados";
+
+  const [logoSumiu, setLogoSumiu] = useState(false);
+
+  useEffect(() => {
+    if (!afiliados) return undefined;
+    const t = setTimeout(() => setLogoSumiu(true), 1000);
+    return () => {
+      clearTimeout(t);
+      setLogoSumiu(false);
+    };
+  }, [afiliados]);
+
+  const painelAberto = afiliados && logoSumiu;
 
   return (
     <div className="w-full flex flex-col md:flex-row items-center justify-center py-4 md:py-0">
@@ -127,7 +209,11 @@ export default function Corpo({ secao }: corpoProps) {
         </div>
       </div>
 
-      <div className="relative flex items-center justify-center shrink-0">
+      <div
+        className={`relative flex items-center justify-center shrink-0 transition-opacity duration-[1000ms] ease-in-out ${
+          afiliados ? "opacity-0 pointer-events-none" : "opacity-100"
+        } ${logoSumiu ? "hidden" : ""}`}
+      >
         <a
           className={`${iconeSocial(inicio)} right-full mr-3 block w-12 h-12 md:w-16 md:h-16 border rounded-full overflow-hidden bg-white hover:scale-105`}
           href={LINK_YOUTUBE}
@@ -244,26 +330,71 @@ export default function Corpo({ secao }: corpoProps) {
             <img
               className="w-full h-52 object-cover"
               src="/b1on.png"
-              alt="Presets Zoom - em breve"
+              alt="Presets Zoom B1on"
             />
 
             <div className="p-4">
               <h3 className="font-heading text-black font-bold text-lg uppercase tracking-wide">
-                em breve
+                presets zoom b1on
               </h3>
-              <p className="text-xs text-stone-500">Zoom</p>
-              <p className="text-sm text-stone-700 mt-2">
-                5 presets para você usar na zoom.
-              </p>
-              <button
-                disabled
-                className="mt-3 bg-stone-400 text-white rounded-2xl px-4 py-2 cursor-not-allowed"
+              <p className="text-xs text-stone-500">zoom</p>
+              <p className="text-sm text-stone-700 mt-2">6 presets para b1on</p>
+              <a
+                href={urlDownload(ZOOM_ARQUIVO)}
+                className="mt-3 inline-block bg-stone-900 text-white rounded-2xl px-4 py-2 transform hover:-translate-y-0.5"
               >
-                Em breve
-              </button>
+                Baixar
+              </a>
             </div>
           </div>
         )}
+      </div>
+
+      <div className={painelAfiliados(painelAberto)}>
+        <h2 className="font-heading text-black font-bold text-2xl uppercase tracking-wide">
+          Equipo de baixo custo
+        </h2>
+        <p className="text-sm text-stone-600 mt-1 mb-4">
+          Ao comprar por estes links, o canal ganha uma pequena comissão, sem
+          custo extra para você.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {listaAfiliados.map((a, i) => (
+            <div
+              key={i}
+              className="border rounded-2xl overflow-hidden shadow bg-white"
+            >
+              <img
+                className="w-full h-44 object-cover"
+                src={a.imagem}
+                alt={a.nome}
+              />
+              <div className="p-4">
+                <h3 className="font-heading text-black font-bold text-lg uppercase tracking-wide">
+                  {a.nome}
+                </h3>
+                <p className="text-xs text-stone-500">
+                  {a.tipo} · {a.loja}
+                </p>
+                {a.descricao && (
+                  <p className="text-sm text-stone-700 mt-2">{a.descricao}</p>
+                )}
+                {a.preco && (
+                  <p className="text-sm font-bold text-black mt-2">{a.preco}</p>
+                )}
+                <a
+                  href={a.url}
+                  target="_blank"
+                  rel="sponsored noopener noreferrer"
+                  className="mt-3 inline-block bg-stone-900 text-white rounded-2xl px-4 py-2 transform hover:-translate-y-0.5"
+                >
+                  Ver na loja
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
