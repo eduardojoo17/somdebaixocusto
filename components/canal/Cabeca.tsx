@@ -1,16 +1,19 @@
 "use client";
+
+import type { Secao } from "@/types/secao";
+
 type cabecaProps = {
-  selecionar: (nome: string) => void;
+  selecionar: (nome: Secao) => void;
 };
 
-export default function Cabeca({ selecionar }: cabecaProps) {
-  const menuTopo = [
-    { id: "inicio", texto: "Início" },
-    { id: "sobre", texto: "Sobre" },
-    { id: "downloads", texto: "Downloads" },
-    { id: "afiliados", texto: "Equipo de Baixo Custo" },
-  ];
+const menuTopo: { id: Secao; texto: string }[] = [
+  { id: "inicio", texto: "Início" },
+  { id: "sobre", texto: "Sobre" },
+  { id: "downloads", texto: "Downloads" },
+  { id: "afiliados", texto: "Equipo de Baixo Custo" },
+];
 
+export default function Cabeca({ selecionar }: cabecaProps) {
   return (
     <header className="flex flex-row flex-wrap text-center text-white gap-2 p-2 bg-stone-900 justify-end font-heading tracking-wide">
       {menuTopo.map((n) => (

@@ -2,9 +2,10 @@
 import Cabeca from "@/components/canal/Cabeca";
 import Corpo from "@/components/canal/Corpo";
 import { useState } from "react";
+import type { Secao } from "@/types/secao";
 
 export default function Canal() {
-  const [secao, setSecao] = useState<string>("inicio");
+  const [secao, setSecao] = useState<Secao>("inicio");
 
   return (
     <div className="min-h-screen flex flex-col bg-pastel">
