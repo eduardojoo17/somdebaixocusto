@@ -1,34 +1,61 @@
+"use client";
+
+import { useState } from "react";
 import type { Afiliado } from "@/data/afiliados";
-import Botao from "./Botao";
+import { categorias } from "@/data/afiliados";
 import StoreBadge from "./StoreBadge";
+import ModalProduto from "./ModalProduto";
+
+const formatarPreco = (valor: number) =>
+  valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export default function AfiliadoCard({ afiliado: a }: { afiliado: Afiliado }) {
-  return (
-    <li className="flex flex-col sm:flex-row sm:items-center gap-4 p-4">
-      <img
-        className="w-full h-40 sm:w-24 sm:h-24 rounded-xl object-cover shrink-0"
-        src={a.imagem}
-        alt={a.nome}
-      />
+  const [aberto, setAberto] = useState(false);
+  const nomeCategoria = categorias.find((c) => c.slug === a.categoria)?.nome;
 
-      <div className="flex-1 min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className="font-heading text-black font-bold text-lg uppercase tracking-wide">
+  return (
+    <li>
+      <button
+        type="button"
+        onClick={() => setAberto(true)}
+        className="group w-full h-full flex flex-col text-left bg-white border border-stone-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:border-orange-300 transition"
+      >
+        <div className="relative h-24 sm:h-28 bg-stone-100 flex items-center justify-center p-2">
+          <img
+            src={a.imagem}
+            alt={a.nome}
+            className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
+          />
+          {a.status === "testado" && (
+            <span className="absolute top-1.5 left-1.5 text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-orange-500 text-white shadow">
+              Testado
+            </span>
+          )}
+        </div>
+
+        <div className="p-2.5 flex flex-col gap-0.5 flex-1">
+          <p className="text-[10px] uppercase tracking-wide text-stone-500 truncate">
+            {a.marca}
+            {nomeCategoria ? ` · ${nomeCategoria}` : ""}
+          </p>
+          <h3 className="font-heading text-black font-bold text-sm leading-tight uppercase tracking-wide">
             {a.nome}
           </h3>
-          <StoreBadge nome={a.loja} />
-        </div>
-        <p className="text-xs text-stone-500">{a.tipo}</p>
-        {a.descricao && (
-          <p className="text-sm text-stone-700 mt-1">{a.descricao}</p>
-        )}
-      </div>
 
-      <div className="sm:shrink-0">
-        <Botao href={a.url} externo>
-          Ver preço na loja
-        </Botao>
-      </div>
+          <div className="mt-auto pt-1.5 flex items-center justify-between gap-2">
+            <StoreBadge nome={a.loja} />
+            {a.preco !== undefined && (
+              <span className="text-xs font-semibold text-stone-800">
+                {formatarPreco(a.preco)}
+              </span>
+            )}
+          </div>
+        </div>
+      </button>
+
+      {aberto && (
+        <ModalProduto afiliado={a} onFechar={() => setAberto(false)} />
+      )}
     </li>
   );
 }
