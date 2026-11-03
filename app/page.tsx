@@ -1,9 +1,9 @@
 "use client";
-import Cabeca from "@/components/curriculo/Cabeca";
-import Corpo from "@/components/curriculo/Corpo";
+import Cabeca from "@/components/canal/Cabeca";
+import Corpo from "@/components/canal/Corpo";
 import { useState } from "react";
 
-export default function Curriculo() {
+export default function Canal() {
   const [secao, setSecao] = useState<string>("inicio");
 
   return (
