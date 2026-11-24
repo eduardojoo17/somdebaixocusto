@@ -149,9 +149,34 @@ export const listaAfiliados: Afiliado[] = [
     imagem: "/afiliados/solez.png",
     criadoEm: "2026-11-03",
   },
+  {
+    nome: "M-Vave Tank Pro",
+    marca: "M-Vave",
+    tipo: "Pedaleira",
+    categoria: "pedaleiras",
+    status: "selecionado",
+    loja: "AliExpress",
+    descricao: "",
+    url: "https://s.click.aliexpress.com/e/_m08xw6B",
+    imagem: "/afiliados/tankpro.png",
+    criadoEm: "2026-11-24",
+  },
+  {
+    nome: "M-Vave MK300",
+    marca: "M-Vave",
+    tipo: "Multiefeitos para guitarra e baixo",
+    categoria: "pedaleiras",
+    status: "selecionado",
+    loja: "Shopee",
+    descricao: "",
+    url: "https://s.shopee.com.br/5AuJhzOBZf",
+    imagem: "/afiliados/mk300.png",
+    criadoEm: "2026-11-24",
+  },
 ];
 
 export const lojas: Record<string, { fundo: string; texto: string }> = {
   "Mercado Livre": { fundo: "#FFE600", texto: "#2D3277" },
   AliExpress: { fundo: "#E62E04", texto: "#FFFFFF" },
+  Shopee: { fundo: "#EE4D2D", texto: "#FFFFFF" },
 };
